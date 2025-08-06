@@ -1,0 +1,102 @@
+### Test 1: Get All Users
+GET http://localhost:5093/api/users
+Accept: application/json
+
+### Test 2: Create Valid User
+POST http://localhost:5093/api/users
+Content-Type: application/json
+
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "john.doe@example.com",
+  "department": "Engineering"
+}
+
+### Test 3: Create User - Missing Required Fields (Should return 400)
+POST http://localhost:5093/api/users
+Content-Type: application/json
+
+{
+  "firstName": "",
+  "lastName": "Doe",
+  "email": "",
+  "department": "Engineering"
+}
+
+### Test 4: Create User - Invalid Email (Should return 400)
+POST http://localhost:5093/api/users
+Content-Type: application/json
+
+{
+  "firstName": "Jane",
+  "lastName": "Smith", 
+  "email": "invalid-email",
+  "department": "Marketing"
+}
+
+### Test 5: Create User - Null Body (Should return 400)
+POST http://localhost:5093/api/users
+Content-Type: application/json
+
+### Test 6: Get User by ID
+GET http://localhost:5093/api/users/1
+Accept: application/json
+
+### Test 7: Get Non-existent User (Should return 404)
+GET http://localhost:5093/api/users/999
+Accept: application/json
+
+### Test 8: Update User (should return 204)
+PUT http://localhost:5093/api/users/1
+Content-Type: application/json
+
+{
+  "firstName": "John Updated",
+  "lastName": "Doe Updated",
+  "email": "john.updated@example.com",
+  "department": "Senior Engineering"
+}
+
+### Test 9: Update Non-existent User (Should return 404)
+PUT http://localhost:5093/api/users/999
+Content-Type: application/json
+
+{
+  "firstName": "Ghost",
+  "lastName": "User",
+  "email": "ghost@example.com",
+  "department": "Nowhere"
+}
+
+### Test 10: Update with Null Body (Should return 400)
+PUT http://localhost:5093/api/users/1
+Content-Type: application/json
+
+### Test 11: Delete User
+DELETE http://localhost:5093/api/users/1
+
+### Test 12: Delete Non-existent User (Should return 404)
+DELETE http://localhost:5093/api/users/999
+
+### Test 13: Create Jane Smith first
+POST http://localhost:5093/api/users
+Content-Type: application/json
+
+{
+  "firstName": "Jane",
+  "lastName": "Smith",
+  "email": "jane.smith@example.com",
+  "department": "Marketing"
+}
+
+### Test 14: Try to create duplicate of Jane (Should return 409)
+POST http://localhost:5093/api/users
+Content-Type: application/json
+
+{
+  "firstName": "Jane Duplicate",
+  "lastName": "Smith Duplicate",
+  "email": "jane.smith@example.com",
+  "department": "Sales"
+}
