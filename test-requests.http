@@ -56,7 +56,7 @@ DELETE http://localhost:5093/api/users/999
 Authorization: Bearer token-john.doe
 
 ### Test 8: DELETE User (with token)
-DELETE http://localhost:5093/api/users/1
+DELETE http://localhost:5093/api/users/3
 Authorization: Bearer token-john.doe
 
 ### ============================================
