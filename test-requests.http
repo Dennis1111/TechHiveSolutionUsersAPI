@@ -1,59 +1,102 @@
-### Test 1: Get All Users WITHOUT Authentication (Should return 401)
+### Test 1: Try to access API WITHOUT authentication (should fail with 401)
 GET http://localhost:5093/api/users
 Accept: application/json
 
-### Test 2: Login to get authentication token
+### Test 2: Login to get token
 POST http://localhost:5093/api/auth/login
 Content-Type: application/json
 
 {
-  "username": "admin",
-  "password": "admin123"
+  "username": "john.doe",
+  "password": "password123"
 }
 
-### Test 3: Get All Users WITH Authentication (Should succeed)
+### Test 3: GET All Users (with token)
 GET http://localhost:5093/api/users
-Authorization: Bearer your-secret-api-token-12345
+Authorization: Bearer token-john.doe
 Accept: application/json
 
-### Test 4: Create Valid User WITH Authentication
+### Test 4: GET User by ID (with token)
+GET http://localhost:5093/api/users/2
+Authorization: Bearer token-john.doe
+Accept: application/json
+
+### Test 5: CREATE User (with token)
 POST http://localhost:5093/api/users
-Authorization: Bearer your-secret-api-token-12345
+Authorization: Bearer token-john.doe
 Content-Type: application/json
 
 {
-  "firstName": "John",
+  "firstName": "New",
+  "lastName": "Employee",
+  "email": "new@example.com",
+  "department": "Sales",
+  "username": "new.employee",
+  "password": "newpass123",
+  "role": "Employee"
+}
+
+### Test 6: UPDATE User (with token)
+PUT http://localhost:5093/api/users/1
+Authorization: Bearer token-john.doe
+Content-Type: application/json
+
+{
+  "firstName": "John Updated",
   "lastName": "Doe",
-  "email": "john.doe@example.com",
-  "department": "Engineering"
+  "email": "john.updated@example.com",
+  "department": "IT Updated",
+  "username": "john.doe",
+  "password": "password123",
+  "role": "Employee"
 }
 
-### Test 5: Try to Create User WITHOUT Authentication (Should return 401)
-POST http://localhost:5093/api/users
-Content-Type: application/json
+### Test 7: DELETE User that doesn't exist (with token)
+DELETE http://localhost:5093/api/users/999
+Authorization: Bearer token-john.doe
 
-{
-  "firstName": "Jane",
-  "lastName": "Smith",
-  "email": "jane@example.com",
-  "department": "Marketing"
-}
+### Test 8: DELETE User (with token)
+DELETE http://localhost:5093/api/users/1
+Authorization: Bearer token-john.doe
 
-### Test 6: Test with Invalid Token (Should return 401)
-GET http://localhost:5093/api/users
-Authorization: Bearer invalid-token-12345
+### ============================================
+### ERROR HANDLING TESTS
+### ============================================
+
+### Test 9: Trigger Global Exception - Test ErrorHandlingMiddleware
+GET http://localhost:5093/api/users/test-exception
+Authorization: Bearer token-john.doe
 Accept: application/json
 
-### Test 7: Test Different Valid Users
+### Test 10: Try with invalid token (should fail with 401)
+GET http://localhost:5093/api/users
+Authorization: Bearer invalid-token
+Accept: application/json
+
+### Test 11: Try invalid login credentials (should fail with 401)
 POST http://localhost:5093/api/auth/login
 Content-Type: application/json
 
 {
-  "username": "manager",
-  "password": "manager123"
+  "username": "invalid",
+  "password": "wrong"
 }
 
-### Test 8: Use Manager Token
+### ============================================
+### TOKEN EXPIRATION TEST
+### ============================================
+### ⏰ WAIT 3+ MINUTES after Test 2, then run this:
+
+### Test 12: Token should be expired (should fail with 401)
 GET http://localhost:5093/api/users
-Authorization: Bearer your-secret-api-token-12345
+Authorization: Bearer token-john.doe
 Accept: application/json
+
+### ============================================
+### TESTING SUMMARY:
+### ✅ Authentication required (Test 1 fails, Tests 3-8 succeed)
+### ✅ All API endpoints work with valid token
+### ✅ Error handling works (Test 9 returns 500 with clean JSON)
+### ✅ Invalid tokens rejected (Tests 10-11 fail)
+### ✅ Token expiration works (Test 12 fails after waiting)
+### ============================================

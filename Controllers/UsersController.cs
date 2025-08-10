@@ -114,5 +114,11 @@ namespace UserManagementAPI.Controllers
                 return StatusCode(500, "An error occurred while deleting the user");
             }
         }
+        
+        [HttpGet("test-exception")]
+        public ActionResult TestException()
+        {
+            throw new Exception("Test exception for ErrorHandlingMiddleware demonstration");
+        }
     }
 }

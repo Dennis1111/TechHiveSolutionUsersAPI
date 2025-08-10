@@ -9,5 +9,6 @@ namespace UserManagementAPI.Services
         User Add(User user);
         bool Update(int id, User user);
         bool Delete(int id);
+        User? GetByUsername(string username);
     }
 }

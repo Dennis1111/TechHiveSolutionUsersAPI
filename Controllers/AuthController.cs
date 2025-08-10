@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using UserManagementAPI.Controllers; // ← Added using statement
+using UserManagementAPI.Services;
 
 namespace UserManagementAPI.Controllers
 {
@@ -8,10 +8,12 @@ namespace UserManagementAPI.Controllers
     public class AuthController : ControllerBase
     {
         private readonly ILogger<AuthController> _logger;
+        private readonly IUserService _userService;
 
-        public AuthController(ILogger<AuthController> logger)
+        public AuthController(ILogger<AuthController> logger, IUserService userService)
         {
             _logger = logger;
+            _userService = userService;
         }
 
         [HttpPost("login")]
@@ -20,44 +22,30 @@ namespace UserManagementAPI.Controllers
             if (request == null)
                 return BadRequest("Login data is required");
 
-            var validUsers = new Dictionary<string, string>
-            {
-                { "admin", "admin123" },
-                { "manager", "manager123" },
-                { "developer", "dev123" }
-            };
+            // Check against all users in the system
+            var user = _userService.GetByUsername(request.Username);
 
-            if (validUsers.ContainsKey(request.Username) && 
-                validUsers[request.Username] == request.Password)
+            if (user != null && user.Password == request.Password && user.IsActive)
             {
-                var token = TokenManager.CreateToken(request.Username);
+                var token = TokenManager.CreateToken(user.Username);
 
                 var response = new LoginResponse
                 {
                     Token = token,
                     TokenType = "Bearer",
-                    ExpiresIn = TokenManager.ExpirySeconds, // ← Get from TokenManager
-                    Username = request.Username,
-                    Role = GetUserRole(request.Username)
+                    ExpiresIn = TokenManager.ExpirySeconds,
+                    Username = user.Username,
+                    Role = user.Role,
+                    UserId = user.Id,
+                    FullName = $"{user.FirstName} {user.LastName}"
                 };
 
-                _logger.LogInformation("Token created for user: {Username}, expires in {Minutes} minutes", 
-                    request.Username, TokenManager.ExpirySeconds / 60);
+                _logger.LogInformation("Login successful for {Username} ({Role})", user.Username, user.Role);
                 return Ok(response);
             }
 
-            _logger.LogWarning("Failed login attempt for user: {Username}", request.Username);
+            _logger.LogWarning("Failed login attempt for user: {Username}", request.Username ?? "unknown");
             return Unauthorized(new { message = "Invalid username or password" });
-        }
-
-        private static string GetUserRole(string username)
-        {
-            return username switch
-            {
-                "admin" => "Administrator",
-                "manager" => "Manager", 
-                _ => "User"
-            };
         }
     }
 
@@ -74,6 +62,8 @@ namespace UserManagementAPI.Controllers
         public int ExpiresIn { get; set; }
         public string Username { get; set; } = string.Empty;
         public string Role { get; set; } = string.Empty;
+        public int UserId { get; set; }
+        public string FullName { get; set; } = string.Empty;
     }
 
     public static class TokenManager
@@ -81,12 +71,10 @@ namespace UserManagementAPI.Controllers
         private static readonly Dictionary<string, DateTime> _tokenExpiry = new();
         private const int ExpiryMinutes = 1; // 1 minutes for testing
 
-        // Add this property to expose the expiry time
         public static int ExpirySeconds => ExpiryMinutes * 60;
 
         public static string CreateToken(string username)
         {
-            // Simple, predictable token format
             var token = $"token-{username}";
             _tokenExpiry[token] = DateTime.UtcNow.AddMinutes(ExpiryMinutes);
             return token;
@@ -99,7 +87,7 @@ namespace UserManagementAPI.Controllers
 
             if (DateTime.UtcNow > expiry)
             {
-                _tokenExpiry.Remove(token); // Clean up expired token
+                _tokenExpiry.Remove(token);
                 return false;
             }
 

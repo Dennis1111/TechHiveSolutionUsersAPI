@@ -6,20 +6,34 @@ namespace UserManagementAPI.Models
     {
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "First name is required")]
+        [Required]
         [StringLength(50)]
         public string FirstName { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Last name is required")]
+        [Required]
         [StringLength(50)]
         public string LastName { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Email is required")]
-        [EmailAddress(ErrorMessage = "Invalid email address")]
+        [Required]
+        [EmailAddress]
         public string Email { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Department is required")]
+        [Required]
         [StringLength(50)]
         public string Department { get; set; } = string.Empty;
+
+        // Add authentication fields
+        [Required]
+        [StringLength(30)]
+        public string Username { get; set; } = string.Empty;
+
+        [Required]
+        [StringLength(100)]
+        public string Password { get; set; } = string.Empty;
+
+        [StringLength(20)]
+        public string Role { get; set; } = "Employee"; // Employee, Manager, Admin
+
+        public bool IsActive { get; set; } = true;
     }
 }
