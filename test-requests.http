@@ -85,18 +85,9 @@ Content-Type: application/json
 ### ============================================
 ### TOKEN EXPIRATION TEST
 ### ============================================
-### WAIT 1 MINUTES then run this:
+### WAIT 1 MINUTE then run this:
 
 ### Test 12: Token should be expired (should fail with 401)
 GET http://localhost:5093/api/users
 Authorization: Bearer token-john.doe
 Accept: application/json
-
-### ============================================
-### TESTING SUMMARY:
-### ✅ Authentication required (Test 1 fails, Tests 3-8 succeed)
-### ✅ All API endpoints work with valid token
-### ✅ Error handling works (Test 9 returns 500 with clean JSON)
-### ✅ Invalid tokens rejected (Tests 10-11 fail)
-### ✅ Token expiration works (Test 12 fails after waiting)
-### ============================================
