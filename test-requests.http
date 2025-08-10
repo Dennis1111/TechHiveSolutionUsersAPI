@@ -85,7 +85,7 @@ Content-Type: application/json
 ### ============================================
 ### TOKEN EXPIRATION TEST
 ### ============================================
-### ⏰ WAIT 3+ MINUTES after Test 2, then run this:
+### WAIT 1 MINUTES then run this:
 
 ### Test 12: Token should be expired (should fail with 401)
 GET http://localhost:5093/api/users
